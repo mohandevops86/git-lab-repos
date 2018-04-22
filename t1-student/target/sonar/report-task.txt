@@ -1,0 +1,6 @@
+projectKey=com.jdevs:studentapp
+serverUrl=http://104.196.219.208:9000
+serverVersion=7.0.0.36138
+dashboardUrl=http://104.196.219.208:9000/dashboard/index/com.jdevs:studentapp
+ceTaskId=AWGcgape86yMsxKh_I2T
+ceTaskUrl=http://104.196.219.208:9000/api/ce/task?id=AWGcgape86yMsxKh_I2T

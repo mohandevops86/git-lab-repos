@@ -1,0 +1,24 @@
+- name: Deploy war file to nodes.
+  serial: 1
+  hosts: PROD
+  become: yes
+  tasks:
+    - name: Find old war files
+      find:
+        paths: /root/apache-tomcat-8.5.27/webapps
+        file_type: any 
+      register: out
+
+    - name: Remove the old war files
+      file:
+        path: "{{item.path}}"
+        state: absent
+      with_items: "{{out.files}}"
+      
+    - name: Copy the student war file.
+      get_url: 
+        url: "{{URL}}"
+        dest: /root/apache-tomcat-8.5.27/webapps/student.war
+        
+
+  

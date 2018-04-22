@@ -1,0 +1,65 @@
+- name: Remove old war files
+  hosts: localhost
+  tasks:
+    - name: Remove a directory
+      file:
+        path: /tmp/app
+        state: absent
+
+    - name: Create apps directory
+      file:
+        path: /tmp/app
+        state: directory
+
+- name: Pull Student application into Ansible Server.
+  hosts: SLAVE
+  tasks:
+    - name: Find out the file name of war file
+      find:
+        paths: /home/ec2-user/workspace/STUDENT-QA-BUILD/target
+        patterns: "*.war"
+      register: out
+
+    - name: Pull the war file from slave machine
+      fetch:
+        src: "{{item.path}}"
+        dest: /tmp/app
+      with_items: "{{out.files}}"
+
+- name: Setup the war file location.
+  hosts: localhost
+  tasks:
+    - name: Find the files
+      find:
+        paths: /tmp/app
+        patterns: "*.war"
+        recurse: yes
+      register: out
+
+    - set_fact:
+        TOMCAT_FILE_LOC: "{{item.path}}"
+      with_items: "{{out.files}}"
+
+- name: Deploy war file to nodes.
+  hosts: DEV
+  become: yes
+  tasks:
+    - name: Find old war files
+      find:
+        paths: /root/apache-tomcat-8.5.27/webapps
+        file_type: any 
+      register: out
+
+    - name: Remove the old war files
+      file:
+        path: "{{item.path}}"
+        state: absent
+      with_items: "{{out.files}}"
+      
+    - name: Copy the student war file.
+      copy: 
+        src: "{{hostvars['localhost']['TOMCAT_FILE_LOC']}}"
+        dest: /root/apache-tomcat-8.5.27/webapps/student.war
+        
+
+  
